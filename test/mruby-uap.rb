@@ -148,6 +148,84 @@ class GeneralParseTest < MTest::Unit::TestCase
   end
 end
 
+class VersionTest < MTest::Unit::TestCase
+  def test_parse_major
+    version = UserAgentParser::Version.new('1')
+    assert_equal(version.major, '1')
+  end
+
+  def test_parse_major_minor
+    version = UserAgentParser::Version.new('1.2')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+  end
+
+  def test_parse_major_minor_patch
+    version = UserAgentParser::Version.new('1.2.3')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+    assert_equal(version.patch, '3')
+  end
+
+  def test_parse_minor_patch
+    version = UserAgentParser::Version.new('1.2.3b4')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+    assert_equal(version.patch, '3')
+    assert_equal(version.patch_minor, 'b4')
+  end
+
+  def test_parse_minor_patch_bar
+    version = UserAgentParser::Version.new('1.2.3-b4')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+    assert_equal(version.patch, '3')
+    assert_equal(version.patch_minor, 'b4')
+  end
+
+  def test_parse_pre_patch
+    version = UserAgentParser::Version.new('1.2.3pre')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+    assert_equal(version.patch, '3pre')
+  end
+
+  def test_parse_patch_bar
+    version = UserAgentParser::Version.new('1.2.3-45')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2')
+    assert_equal(version.patch, '3-45')
+  end
+
+  def test_parse_minor_patch_array
+    version = UserAgentParser::Version.new(1, '2a', 3, '4b')
+    assert_equal(version.major, '1')
+    assert_equal(version.minor, '2a')
+    assert_equal(version.patch, '3')
+    assert_equal(version.patch_minor, '4b')
+  end
+
+  def test_to_s
+    version = UserAgentParser::Version.new('1.2.3b4')
+    assert_equal(version.to_s, '1.2.3b4')
+  end
+
+  def test_same_version
+    version = UserAgentParser::Version.new('1.2.3')
+    assert_equal(version, UserAgentParser::Version.new('1.2.3'))
+  end
+
+  def test_different_version
+    version = UserAgentParser::Version.new('1.2.3')
+    assert_not_equal(version, UserAgentParser::Version.new('1.2.2'))
+  end
+
+  def test_version_inspect
+    version = UserAgentParser::Version.new('1.2.3')
+    assert_equal(version.inspect, '#<UserAgentParser::Version 1.2.3>')
+  end
+end
+
 if __FILE__ == $0
   MTest::Unit.new.run
 end
