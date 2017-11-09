@@ -37,9 +37,11 @@ MRuby::Build.new do |conf|
 
     # ... (snip) ...
 
+    conf.gem :github => 'naritta/mruby-uap
     conf.gem :github => 'iij/mruby-mtest'
 end
 ```
+Then build mruby and run tests
 ```ruby
 mruby test/mruby-uap.rb
 ```
