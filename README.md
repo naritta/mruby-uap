@@ -42,8 +42,8 @@ MRuby::Build.new do |conf|
 end
 ```
 Then build mruby and run tests
-```ruby
-mruby test/mruby-uap.rb
+```
+$ mruby test/mruby-uap.rb
 ```
 
 ## License
