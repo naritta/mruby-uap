@@ -294,6 +294,47 @@ class OSTest < MTest::Unit::TestCase
   end
 end
 
+class DeviceTest < MTest::Unit::TestCase
+  def test_name
+    os = UserAgentParser::Device.new('iPod')
+    assert_equal(os.name, os.family)
+  end
+
+  def test_to_s
+    os = UserAgentParser::Device.new('iPod')
+    assert_equal(os.to_s, 'iPod')
+  end
+
+  def test_same_device
+    device1 = UserAgentParser::Device.new('iPod')
+    device2 = UserAgentParser::Device.new('iPod')
+    assert_equal(device1, device2)
+  end
+
+  def test_different_device
+    device1 = UserAgentParser::Device.new('iPod')
+    device2 = UserAgentParser::Device.new('iPad')
+    assert_not_equal(device1, device2)
+  end
+
+  def test_same_device_eql
+    device1 = UserAgentParser::Device.new('iPod')
+    device2 = UserAgentParser::Device.new('iPod')
+    assert_equal true, device1.eql?(device2)
+  end
+
+  def test_different_device_eql
+    device1 = UserAgentParser::Device.new('iPod')
+    device2 = UserAgentParser::Device.new('iPad')
+    assert_equal false, device1.eql?(device2)
+  end
+
+  def test_os_inspect
+    device = UserAgentParser::Device.new('iPod')
+    assert_equal(device.inspect.to_s, '#<UserAgentParser::Device iPod>')
+  end
+end
+
 if __FILE__ == $0
   MTest::Unit.new.run
 end
