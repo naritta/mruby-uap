@@ -30,6 +30,20 @@ operating_system.to_s
 => "Windows Vista"
 ```
 
+## test
+tests can be executed with mruby-mtest
+```ruby
+MRuby::Build.new do |conf|
+
+    # ... (snip) ...
+
+    conf.gem :github => 'iij/mruby-mtest'
+end
+```
+```ruby
+mruby test/mruby-uap.rb
+```
+
 ## License
 
 MIT
