@@ -226,6 +226,74 @@ class VersionTest < MTest::Unit::TestCase
   end
 end
 
+class OSTest < MTest::Unit::TestCase
+  def test_name_family
+    os = UserAgentParser::OperatingSystem.new('Windows')
+    assert_equal(os.name, os.family)
+  end
+
+  def test_to_s
+    os = UserAgentParser::OperatingSystem.new('Windows')
+    assert_equal(os.to_s, 'Windows')
+  end
+
+  def test_version_os
+    version = UserAgentParser::Version.new('7')
+    os = UserAgentParser::OperatingSystem.new('Windows', version)
+    assert_equal(os.to_s, 'Windows 7')
+  end
+
+  def test_same_os
+    version = UserAgentParser::Version.new('7')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', version)
+    os2 = UserAgentParser::OperatingSystem.new('Windows', version)
+    assert_equal(os1, os2)
+  end
+
+  def test_different_version_os
+    seven = UserAgentParser::Version.new('7')
+    eight = UserAgentParser::Version.new('8')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', seven)
+    os2 = UserAgentParser::OperatingSystem.new('Windows', eight)
+    assert_not_equal(os1, os2)
+  end
+
+  def test_different_os
+    version = UserAgentParser::Version.new('7')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', version)
+    os2 = UserAgentParser::OperatingSystem.new('Blah', version)
+    assert_not_equal(os1, os2)
+  end
+
+  def test_same_os_eql
+    version = UserAgentParser::Version.new('7')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', version)
+    os2 = UserAgentParser::OperatingSystem.new('Windows', version)
+    assert_equal true, os1.eql?(os2)
+  end
+
+  def test_different_version_eql
+    seven = UserAgentParser::Version.new('7')
+    eight = UserAgentParser::Version.new('8')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', seven)
+    os2 = UserAgentParser::OperatingSystem.new('Windows', eight)
+    assert_equal false, os1.eql?(os2)
+  end
+
+  def test_different_os_eql
+    version = UserAgentParser::Version.new('7')
+    os1 = UserAgentParser::OperatingSystem.new('Windows', version)
+    os2 = UserAgentParser::OperatingSystem.new('Blah', version)
+    assert_equal false, os1.eql?(os2)
+  end
+
+  def test_os_inspect
+    version = UserAgentParser::Version.new('10.7.4')
+    os = UserAgentParser::OperatingSystem.new('OS X', version)
+    assert_equal os.inspect.to_s, '#<UserAgentParser::OperatingSystem OS X 10.7.4>'
+  end
+end
+
 if __FILE__ == $0
   MTest::Unit.new.run
 end
