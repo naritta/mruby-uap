@@ -58,7 +58,7 @@ class UserAgentParserTest < MTest::Unit::TestCase
     assert_equal(agent1, agent2)
   end
 
-  def test_different_os
+  def test_different_os2
     version = UserAgentParser::Version.new('1.0')
     windows = UserAgentParser::OperatingSystem.new('Windows')
     mac = UserAgentParser::OperatingSystem.new('Mac')
@@ -67,7 +67,7 @@ class UserAgentParserTest < MTest::Unit::TestCase
     assert_not_equal(agent1, agent2)
   end
 
-  def test_different_version
+  def test_different_version2
     browser_version1 = UserAgentParser::Version.new('1.0')
     browser_version2 = UserAgentParser::Version.new('2.0')
     os = UserAgentParser::OperatingSystem.new('Windows')
@@ -332,6 +332,118 @@ class DeviceTest < MTest::Unit::TestCase
   def test_os_inspect
     device = UserAgentParser::Device.new('iPod')
     assert_equal(device.inspect.to_s, '#<UserAgentParser::Device iPod>')
+  end
+end
+
+class UapCoreCaseTest < MTest::Unit::TestCase
+  PARSER = UserAgentParser::Parser.new
+
+  def file_to_yaml(resource)
+    uap_path = File.expand_path('../../uap-core', __FILE__)
+    resource_path = File.join(uap_path, resource)
+    yml_str = File.read(resource_path)
+    YAML.load(yml_str)
+  end
+
+  def file_to_test_cases(file)
+    file_to_yaml(file)['test_cases'].map do |test_case|
+      {
+          'user_agent_string' => test_case['user_agent_string'],
+          'family'            => test_case['family'],
+          'major'             => test_case['major'],
+          'minor'             => test_case['minor'],
+          'patch'             => test_case['patch'],
+          'patch_minor'       => test_case['patch_minor'],
+          'brand'             => test_case['brand'],
+          'model'             => test_case['model']
+      }
+    end.reject do |test_case|
+      # We don't do the hacky javascript user agent overrides
+      test_case.key?('js_ua') ||
+          test_case['family'] == 'IE Platform Preview' ||
+          test_case['user_agent_string'].include?('chromeframe;')
+    end
+  end
+
+  def user_agent_test_cases
+    file_to_test_cases('test_resources/firefox_user_agent_strings.yaml')
+    file_to_test_cases('tests/test_ua.yaml')
+  end
+
+  def operating_system_test_cases
+    file_to_test_cases('tests/test_os.yaml') +
+        file_to_test_cases('test_resources/additional_os_tests.yaml')
+  end
+
+  def device_test_cases
+    file_to_test_cases('tests/test_device.yaml')
+  end
+
+  def test_parse_UA
+    user_agent_test_cases.each do |test_case|
+      user_agent = PARSER.parse(test_case['user_agent_string'])
+      if test_case['family']
+        assert_equal(user_agent.family, test_case['family'])
+      end
+
+      if test_case['major']
+        assert_equal(user_agent.version.major, test_case['major'])
+      end
+
+      if test_case['minor']
+        assert_equal(user_agent.version.minor, test_case['minor'])
+      end
+
+      if test_case['patch']
+        assert_equal(user_agent.version.patch, test_case['patch'])
+      end
+    end
+  end
+
+  def test_parse_os
+    operating_system_test_cases.each do |test_case|
+      user_agent = PARSER.parse(test_case['user_agent_string'])
+      operating_system = user_agent.os
+
+      if test_case['family']
+        assert_equal(operating_system.family, test_case['family'])
+      end
+
+      if test_case['major']
+        assert_equal(operating_system.version.major, test_case['major'])
+      end
+
+      if test_case['minor']
+        assert_equal(operating_system.version.minor, test_case['minor'])
+      end
+
+      if test_case['patch']
+        assert_equal(operating_system.version.patch, test_case['patch'])
+      end
+
+      if test_case['patch_minor']
+        assert_equal(operating_system.version.patch_minor, test_case['patch_minor'])
+      end
+    end
+  end
+
+  def test_parse_device
+    device_test_cases.each do |test_case|
+      user_agent = PARSER.parse(test_case['user_agent_string'])
+      device = user_agent.device
+
+      if test_case['family']
+        assert_equal(device.family, test_case['family'])
+      end
+
+      if test_case['model']
+        assert_equal(device.model, test_case['model'])
+      end
+
+      if test_case['brand']
+        assert_equal(device.brand, test_case['brand'])
+      end
+    end
   end
 end
 
