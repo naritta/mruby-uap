@@ -23,7 +23,11 @@ module UserAgentParser
       # Parse all the regexs
       yml.each_pair do |type, patterns|
         patterns.each do |pattern|
-          pattern["regex"] = Regexp.new(pattern["regex"]) unless pattern["regex_flag"] == 'i'
+          if pattern["regex_flag"] == 'i'
+            pattern["regex"] = Regexp.new(pattern["regex"], Regexp::IGNORECASE)
+          else
+            pattern["regex"] = Regexp.new(pattern["regex"])
+          end
         end
       end
 
